@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catalog</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .hd{background:var(--navy);color:#fff;padding:18px 16px}
+  .hd .w{max-width:1200px;margin:0 auto;display:flex;gap:14px;align-items:center}
+  .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .item{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column}
+  .item .img{aspect-ratio:1/1;background:#f1f5f9;display:grid;place-items:center;font-size:44px}
+  .item .img img{width:100%;height:100%;object-fit:cover}
+  .item .b{padding:12px;display:flex;flex-direction:column;gap:4px;flex:1}
+</style>
+</head>
+<body>
+<div class="hd"><div class="w"><img id="logo" style="height:54px;border-radius:8px;background:#fff;display:none"><div class="grow"><h2 id="shop" style="margin:0"></h2><div class="small" style="color:#cbd5e1" id="info"></div></div><a class="btn ok" id="wa" target="_blank">💬 WhatsApp</a></div></div>
+<div style="max-width:1200px;margin:0 auto;padding:16px">
+  <div class="row" style="margin-bottom:12px"><input class="in grow" id="q" placeholder="🔍"><div class="chips" id="cats"></div></div>
+  <div class="cgrid" id="grid"></div>
+</div>
+<script src="/js/core.js"></script>
+<script>
+(async () => {
+  const slug = location.pathname.split('/').pop();
+  let d;
+  try { d = await BX.get('/api/public/catalog/' + encodeURIComponent(slug)); } catch (e) { document.body.innerHTML = '<div class="empty" style="padding:80px">' + esc(e.message) + '</div>'; return; }
+  if (!localStorage.getItem('bx_lang')) { BX.lang = d.shop.language || 'bn'; BX.digits = BX.lang; }
+  document.title = d.shop.name;
+  $('#shop').textContent = d.shop.name;
+  $('#info').textContent = [d.shop.address, d.shop.phone && BX.dg(d.shop.phone)].filter(Boolean).join(' • ');
+  if (d.shop.logo) { $('#logo').src = d.shop.logo; $('#logo').style.display = ''; }
+  $('#wa').href = BX.waLink(d.shop.whatsapp, L('আসসালামু আলাইকুম, আমি পণ্য সম্পর্কে জানতে চাই।', 'Hello, I would like to know about your products.'));
+  $('#q').placeholder = '🔍 ' + L('পণ্য খুঁজুন', 'Search products');
+  const cats = [...new Set(d.products.map(p => p.category).filter(Boolean))];
+  let cat = '', q = '';
+  $('#cats').innerHTML = `<span class="chip on" data-c="">${L('সব', 'All')}</span>` + cats.map(c => `<span class="chip" data-c="${esc(c)}">${esc(c)}</span>`).join('');
+  const icon = k => ({ tile: '🧱', sanitary: '🚿', hardware: '🔧' }[k] || '📦');
+  const draw = () => {
+    const ql = q.toLowerCase();
+    const list = d.products.filter(p => (!cat || p.category === cat) && (!ql || (p.name + ' ' + (p.name_bn || '') + ' ' + (p.size || '') + ' ' + (p.brand || '')).toLowerCase().includes(ql)));
+    $('#grid').innerHTML = list.map(p => {
+      const box = p.kind === 'tile' && p.sqft_per_pcs && p.pcs_per_box ? p.retail_price * p.sqft_per_pcs * p.pcs_per_box : null;
+      const msg = `${L('আমি এই পণ্যটি অর্ডার করতে চাই', 'I want to order this product')}: ${p.name}${p.size ? ' (' + p.size + ')' : ''}`;
+      return `<div class="item"><div class="img">${p.image ? `<img src="${p.image}" loading="lazy" alt="">` : icon(p.kind)}</div><div class="b">
+        <b>${esc(L(p.name_bn || p.name, p.name))}</b><div class="small mute">${esc([p.size, p.brand].filter(Boolean).join(' • '))}</div>
+        ${p.retail_price !== null ? `<div style="color:var(--pri);font-weight:700">${BX.tk(p.retail_price)} <span class="small mute">/ ${esc(BX.unitLabel(p.base_unit))}</span></div>${box ? `<div class="small">${BX.tk(box)} / ${L('বক্স', 'box')}</div>` : ''}` : ''}
+        <div class="small ${p.in_stock ? 'ok' : 'bad'}">${p.in_stock ? '✓ ' + L('স্টকে আছে', 'In stock') : L('স্টক নেই', 'Out of stock')}</div>
+        ${p.description ? `<div class="small mute">${esc(p.description)}</div>` : ''}
+        <a class="btn sm ok" style="margin-top:auto" target="_blank" href="${BX.waLink(d.shop.whatsapp, msg)}">💬 ${L('অর্ডার করুন', 'Order')}</a></div></div>`;
+    }).join('') || `<div class="empty">${L('কোনো পণ্য নেই', 'No products')}</div>`;
+  };
+  $('#q').oninput = e => { q = e.target.value.trim(); draw(); };
+  $$('#cats .chip').forEach(ch => (ch.onclick = () => { cat = ch.dataset.c; $$('#cats .chip').forEach(x => x.classList.toggle('on', x === ch)); draw(); }));
+  draw();
+})();
+</script>
+</body>
+</html>

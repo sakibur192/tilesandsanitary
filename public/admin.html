@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Super Admin — Baybex Tile ERP</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="login" class="hidden" style="min-height:100vh;display:grid;place-items:center;background:var(--navy)">
+  <div class="card" style="width:min(380px,92vw)"><h2>🛡 Super Admin</h2>
+    <div class="f" style="margin-top:12px"><label>Username</label><input class="in" id="lu" autocomplete="username"></div>
+    <div class="f" style="margin-top:10px"><label>Password</label><input class="in" type="password" id="lp" autocomplete="current-password"></div>
+    <button class="btn pri block" style="margin-top:14px" id="lb">Login</button></div>
+</div>
+<div class="app hidden" id="appWrap">
+  <aside class="side" id="side">
+    <div class="brand"><div class="logo">🛡</div><div>Super Admin<div class="small" style="color:#94a3b8;font-weight:500" id="adminName"></div></div></div>
+    <nav id="menu"></nav>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+  <div class="main">
+    <header class="top"><button class="btn ghost menu-btn" id="menuBtn">☰</button><div class="ttl grow" id="pageTitle"></div><a class="btn sm" href="/" target="_blank">🌐 Site</a><button class="btn sm" id="logout">Logout</button></header>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+<script src="/js/core.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>

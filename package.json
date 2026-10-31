@@ -1,0 +1,17 @@
+{
+  "name": "baybex-tile-erp",
+  "version": "1.0.0",
+  "description": "Baybex Tile, Sanitary & Hardware Management System — multi-tenant SaaS for Bangladeshi shops",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}

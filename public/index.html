@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Baybex Tile ERP — Tile, Sanitary & Hardware Management</title>
+<meta name="description" content="টাইলস, স্যানিটারি ও হার্ডওয়্যার দোকানের সম্পূর্ণ হিসাব — বাকির হিসাব, স্টক, ক্যাশবুক, লাভ-ক্ষতি, টাইলস ক্যালকুলেটর।">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body{background:#fff}
+  .lnav .logo{width:38px;height:38px;border-radius:10px;background:var(--pri);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px}
+  .hero-card{background:#fff;color:var(--text);border-radius:18px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+  .demo-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e5e7eb}
+  .why{background:#f0fdfa}
+  .foot{background:var(--navy);color:#cbd5e1;padding:30px 20px;text-align:center}
+  .foot a{color:#5eead4}
+</style>
+</head>
+<body>
+<header style="background:var(--navy)">
+  <div class="lnav">
+    <div class="row" style="color:#fff"><div class="logo">B</div><div><div style="font-weight:700;font-size:18px" id="brand">Baybex Tile ERP</div><div class="small" style="color:#94a3b8" id="brandSub"></div></div></div>
+    <div class="row">
+      <div class="seg" id="langSeg"><button data-l="bn">বাংলা</button><button data-l="en">EN</button></div>
+      <button class="btn sm" id="loginBtn"></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="in-w">
+    <div>
+      <h1 id="heroT"></h1>
+      <p id="heroS"></p>
+      <div class="row" style="margin-top:20px">
+        <button class="btn lg pri" id="signupBtn"></button>
+        <a class="btn lg" id="callBtn" href="#">📞 <span></span></a>
+      </div>
+      <p class="small" style="margin-top:14px;color:#94a3b8" id="trialNote"></p>
+    </div>
+    <div class="hero-card">
+      <div class="row between"><b id="demoTitle"></b><span class="badge ok" id="demoBadge"></span></div>
+      <div style="font-size:30px;font-weight:800;color:var(--bad);margin:10px 0">৳৪৫,০০০</div>
+      <div class="demo-row"><span id="d1"></span><b>৳৩০,০০০</b></div>
+      <div class="demo-row"><span id="d2"></span><b>৳২৫,০০০</b></div>
+      <div class="demo-row"><span id="d3"></span><b class="ok">− ৳১০,০০০</b></div>
+      <div class="demo-row" style="border:0"><b id="d4"></b><b class="bad">৳৪৫,০০০</b></div>
+      <div style="background:#f0fdfa;border-radius:10px;padding:10px;margin-top:10px" class="small"><b id="d5"></b><br><span id="d6"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2 class="center" id="featT" style="font-size:28px"></h2>
+  <p class="center mute" id="featS"></p>
+  <div class="grid g4" id="features" style="margin-top:24px"></div>
+</section>
+
+<section class="why"><div class="sec">
+  <h2 class="center" id="whoT" style="font-size:26px"></h2>
+  <div class="grid g4" id="who" style="margin-top:20px"></div>
+</div></section>
+
+<section class="sec" id="pricing">
+  <h2 class="center" id="priceT" style="font-size:28px"></h2>
+  <p class="center mute" id="priceS"></p>
+  <div class="grid g3" id="plans" style="margin-top:24px;max-width:950px;margin-left:auto;margin-right:auto"></div>
+</section>
+
+<footer class="foot">
+  <div id="footBrand" style="font-weight:700;color:#fff;font-size:18px"></div>
+  <div style="margin-top:8px" id="footContact"></div>
+  <div class="small" style="margin-top:10px;color:#64748b">© <span id="yr"></span> <span id="footCo"></span></div>
+</footer>
+
+<script src="/js/core.js"></script>
+<script>
+let S = {};
+const loggedIn = { v: false };
+
+async function init() {
+  try { S = await BX.get('/api/public/settings'); } catch (e) { S = {}; }
+  try { await BX.get('/api/me'); loggedIn.v = true; } catch (e) {}
+  if (S.primary_color) document.documentElement.style.setProperty('--pri', S.primary_color);
+  render();
+  const h = location.hash;
+  if (h === '#login') openLogin();
+  if (h === '#signup') openSignup();
+}
+
+function render() {
+  document.documentElement.lang = BX.lang;
+  $$('#langSeg button').forEach(b => b.classList.toggle('on', b.dataset.l === BX.lang));
+  const ld = S.landing || {};
+  $('#brand').textContent = S.brand_name || 'Baybex Tile ERP';
+  $('#brandSub').textContent = S.brand_sub || '';
+  document.title = (S.brand_name || 'Baybex Tile ERP') + ' — ' + (S.brand_sub || '');
+  $('#loginBtn').textContent = loggedIn.v ? L('ড্যাশবোর্ড', 'Dashboard') : L('লগইন', 'Login');
+  $('#heroT').textContent = L(ld.hero_bn, ld.hero_en);
+  $('#heroS').textContent = L(ld.sub_bn, ld.sub_en);
+  $('#signupBtn').textContent = S.signup_enabled === false ? L('যোগাযোগ করুন', 'Contact us') : L(`${BX.dg(S.trial_days || 14)} দিন ফ্রি ট্রায়াল শুরু করুন`, `Start ${S.trial_days || 14}-day free trial`);
+  $('#callBtn span').textContent = BX.dg(S.support_phone || '');
+  $('#callBtn').href = 'tel:' + (S.support_phone || '');
+  $('#trialNote').textContent = L('কোনো কার্ড লাগবে না • বাংলা ও ইংরেজি • মোবাইল ও কম্পিউটারে চলে', 'No card needed • Bangla & English • Works on mobile & computer');
+  $('#demoTitle').textContent = L('কাস্টমার লেজার — করিম কন্ট্রাক্টর', 'Customer ledger — Karim Contractor');
+  $('#demoBadge').textContent = L('বাকির হিসাব', 'Customer due');
+  $('#d1').textContent = L('পূর্বের বাকি', 'Previous due');
+  $('#d2').textContent = L('নতুন কেনাকাটা', 'New purchase');
+  $('#d3').textContent = L('জমা', 'Payment received');
+  $('#d4').textContent = L('মোট বাকি', 'Remaining due');
+  $('#d5').textContent = L('📐 টাইলস ক্যালকুলেটর', '📐 Tile calculator');
+  $('#d6').textContent = L('৫০০ স্কয়ার ফিট + ৫% ওয়েস্টেজ = ৩৩ বক্স (২৪×২৪, ৪ পিস/বক্স)', '500 sqft + 5% wastage = 33 boxes (24×24, 4 pcs/box)');
+
+  $('#featT').textContent = L('দোকানদারের যা যা লাগে — সব এক জায়গায়', 'Everything a shop owner needs — in one place');
+  $('#featS').textContent = L('বাংলাদেশের দোকানের জন্য বানানো, বিদেশি জেনেরিক সফটওয়্যার না', 'Built for Bangladeshi shops — not a generic international ERP');
+  $('#features').innerHTML = (ld.features || []).map(f => `<div class="feat"><div class="ic">${esc(f.icon)}</div><h3 style="margin-top:8px">${esc(L(f.bn, f.en))}</h3><div class="mute">${esc(L(f.dbn, f.den))}</div></div>`).join('');
+
+  $('#whoT').textContent = L('কাদের জন্য?', 'Who is it for?');
+  const who = [['🧱', 'টাইলস শোরুম', 'Tile showrooms', 'সিরামিক, পোর্সেলিন, ফ্লোর ও ওয়াল টাইলস', 'Ceramic, porcelain, floor & wall tiles'],
+    ['🚽', 'স্যানিটারি দোকান', 'Sanitary shops', 'কমোড, বেসিন, কল, শাওয়ার ও ফিটিংস', 'Commode, basin, faucets, showers & fittings'],
+    ['🔧', 'হার্ডওয়্যার দোকান', 'Hardware shops', 'টুলস, তালা, পাইপ, ফিটিংস ও নির্মাণ সামগ্রী', 'Tools, locks, pipes, fittings & construction materials'],
+    ['🏗️', 'হোলসেল সাপ্লায়ার', 'Wholesale suppliers', 'বাল্ক নির্মাণ সামগ্রী ও ডিস্ট্রিবিউশন', 'Bulk construction materials & distribution']];
+  $('#who').innerHTML = who.map(w => `<div class="feat center"><div class="ic">${w[0]}</div><h3 style="margin-top:6px">${L(w[1], w[2])}</h3><div class="mute small">${L(w[3], w[4])}</div></div>`).join('');
+
+  $('#priceT').textContent = L('একটাই প্যাকেজ — সব ফিচার', 'One package — all features');
+  $('#priceS').textContent = L('কোনো লুকানো চার্জ নেই। সব মডিউল, মাল্টি-ইউজার ও মাল্টি-ব্রাঞ্চ সহ।', 'No hidden charges. All modules, multi-user and multi-branch included.');
+  const plans = S.plans || [];
+  const best = plans.length ? plans[plans.length - 1].months : 0;
+  $('#plans').innerHTML = plans.map(p => {
+    const perMonth = p.months > 1 ? `<div class="small mute">${L('প্রতি মাসে', 'per month')} ${BX.tk(p.price / p.months)}</div>` : '<div class="small mute">&nbsp;</div>';
+    return `<div class="price-card ${p.months === best && plans.length > 1 ? 'best' : ''}">
+      ${p.months === best && plans.length > 1 ? `<span class="badge ok">${L('সবচেয়ে সাশ্রয়ী', 'Best value')}</span>` : '<span class="badge">&nbsp;</span>'}
+      <h3 style="margin-top:8px">${esc(L(p.label_bn, p.label_en))}</h3>
+      <div class="p">${BX.tk(p.price)}</div>${perMonth}
+      <button class="btn pri block" style="margin-top:14px" onclick="openSignup()">${L('শুরু করুন', 'Get started')}</button></div>`;
+  }).join('');
+
+  $('#footBrand').textContent = S.brand_name || '';
+  $('#footContact').innerHTML = [S.support_phone && `📞 <a href="tel:${esc(S.support_phone)}">${BX.dg(esc(S.support_phone))}</a>`, S.support_email && `✉️ <a href="mailto:${esc(S.support_email)}">${esc(S.support_email)}</a>`, S.website && `🌐 <a href="${esc(S.website)}" target="_blank">${esc(S.website.replace(/^https?:\/\//, ''))}</a>`].filter(Boolean).join(' &nbsp;•&nbsp; ');
+  $('#yr').textContent = BX.dg(new Date().getFullYear());
+  $('#footCo').textContent = S.company || '';
+}
+
+function openLogin() {
+  if (loggedIn.v) { location.href = '/app'; return; }
+  const savedShop = localStorage.getItem('bx_shop') || '';
+  BX.modal({
+    title: L('দোকানে লগইন', 'Shop login'),
+    body: `<div class="grid" style="gap:12px">
+      <div class="f"><label>${L('মোবাইল নাম্বার / ইউজারনেম', 'Mobile number / Username')}</label><input class="in" name="username" autocomplete="username"></div>
+      <div class="f"><label>${L('পাসওয়ার্ড', 'Password')}</label><input class="in" type="password" name="password" autocomplete="current-password"></div>
+      <div class="f"><label>${L('শপ আইডি (স্টাফদের জন্য, ঐচ্ছিক)', 'Shop ID (for staff, optional)')}</label><input class="in" name="shop" value="${esc(savedShop)}" placeholder="e.g. rahim-tiles"></div>
+      <div class="small mute">${L('পাসওয়ার্ড ভুলে গেলে কল করুন', 'Forgot password? Call')} ${BX.dg(esc(S.support_phone || ''))}</div></div>`,
+    onOpen: el => el.addEventListener('keydown', e => { if (e.key === 'Enter') el.querySelector('.mf .pri').click(); }),
+    buttons: [{ label: L('নতুন একাউন্ট', 'New account'), onClick: c => { c(); openSignup(); } }, { label: L('লগইন', 'Login'), cls: 'pri', onClick: async (c, el) => {
+      const b = { username: BX.toEnDigits($('[name=username]', el).value.trim()), password: $('[name=password]', el).value, shop: $('[name=shop]', el).value.trim() };
+      const r = await BX.post('/api/auth/login', b);
+      localStorage.setItem('bx_shop', r.slug);
+      location.href = '/app';
+    } }],
+  });
+}
+
+function openSignup() {
+  if (S.signup_enabled === false) { location.href = 'tel:' + (S.support_phone || ''); return; }
+  BX.modal({
+    title: L('ফ্রি ট্রায়াল — নতুন দোকান খুলুন', 'Free trial — register your shop'),
+    body: `<div class="grid g2">
+      <div class="f" style="grid-column:1/-1"><label>${L('দোকানের নাম', 'Shop name')} *</label><input class="in" name="shop_name" placeholder="${L('যেমন: রহিম টাইলস এন্ড স্যানিটারি', 'e.g. Rahim Tiles & Sanitary')}"></div>
+      <div class="f"><label>${L('মালিকের নাম', 'Owner name')} *</label><input class="in" name="owner_name"></div>
+      <div class="f"><label>${L('মোবাইল নাম্বার', 'Mobile number')} *</label><input class="in" name="phone" inputmode="tel" placeholder="01XXXXXXXXX"></div>
+      <div class="f"><label>${L('ব্যবসার ধরন', 'Business type')}</label><select class="in" name="business_type">
+        <option value="tile">${L('টাইলস ও স্যানিটারি শোরুম', 'Tile & sanitary showroom')}</option>
+        <option value="sanitary">${L('স্যানিটারি দোকান', 'Sanitary shop')}</option>
+        <option value="hardware">${L('হার্ডওয়্যার দোকান', 'Hardware shop')}</option>
+        <option value="wholesale">${L('হোলসেল / নির্মাণ সামগ্রী', 'Wholesale / construction materials')}</option></select></div>
+      <div class="f"><label>${L('পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)', 'Password (min 6)')} *</label><input class="in" type="password" name="password"></div>
+      <div class="f" style="grid-column:1/-1"><label>${L('ঠিকানা', 'Address')}</label><input class="in" name="address"></div>
+      </div><p class="small mute">${L('লগইন করবেন মোবাইল নাম্বার ও পাসওয়ার্ড দিয়ে।', 'You will log in with your mobile number and password.')}</p>`,
+    buttons: [{ label: L('বাতিল', 'Cancel') }, { label: L('একাউন্ট খুলুন', 'Create account'), cls: 'pri', onClick: async (c, el) => {
+      const b = {}; ['shop_name', 'owner_name', 'phone', 'business_type', 'password', 'address'].forEach(k => (b[k] = $(`[name=${k}]`, el).value.trim()));
+      b.phone = BX.toEnDigits(b.phone); b.language = BX.lang;
+      const r = await BX.post('/api/public/signup', b);
+      localStorage.setItem('bx_shop', r.slug);
+      location.href = '/app#/welcome';
+    } }],
+  });
+}
+
+$('#loginBtn').onclick = openLogin;
+$('#signupBtn').onclick = openSignup;
+$$('#langSeg button').forEach(b => (b.onclick = () => { BX.setLang(b.dataset.l); BX.setDigits(b.dataset.l); render(); }));
+init();
+</script>
+</body>
+</html>
